@@ -30,6 +30,9 @@
 /*───────────────────────────────────────────────────────────────────────────│─╗
 │ The LISP Challenge § LISP Machine                                        ─╬─│┼
 ╚────────────────────────────────────────────────────────────────────────────│*/
+char getchar();
+char putchar();
+void exit();
 
 #define kT          4
 #define kQuote      6
@@ -40,49 +43,78 @@
 #define kCons       30
 #define kEq         35
 
-#define M (RAM + sizeof(RAM) / sizeof(RAM[0]) / 2)
+#define RAMSIZE 16384
+#define RAMSIZE_H 8192
+
+#define M (RAM + RAMSIZE_H)
 #define S "NIL\0T\0QUOTE\0COND\0ATOM\0CAR\0CDR\0CONS\0EQ"
+
+
+#define COMPCONST 0x7FFF
+
+int printf(char*c) {
+  while (*c) {
+    putchar(*c++);
+  }
+}
 
 int cx; /* stores negative memory use */
 int dx; /* stores lookahead character */
-int RAM[0100000]; /* your own ibm7090 */
+// int RAM[0100000]; /* your own ibm7090 */
+int RAM[RAMSIZE]; /* your own ibm7090 */
 
-Intern() {
+int Eval();
+int Car();
+int Cdr();
+int GetObject();
+int PrintChar();
+int Cons();
+int GetList();
+
+int Intern() {
   int i, j, x;
+  // printf("Intern");
   for (i = 0; (x = M[i++]);) {
     for (j = 0;; ++j) {
-      if (x != RAM[j]) break;
-      if (!x) return i - j - 1;
+      if (x != RAM[j]) {break;}
+      if (!x) {return i - j - 1;}
       x = M[i++];
     }
     while (x)
-      x = M[i++];
+      {x = M[i++];}
   }
   j = 0;
   x = --i;
-  while ((M[i++] = RAM[j++]));
+  while ((M[i++] = RAM[j++])) {};
   return x;
 }
 
-char str[4096];
-GetChar() {
+char* str[2048];
+
+char *l, *p;
+int GetChar() {
   int c, t;
-  static char *l, *p;
+  // static char *l, *p;
+
   if (!l) {
     l = str;
     while((c = getchar()) != -1) {
       *l = c;
+      // putchar(c);
       l++;
     }
+    // scanf("%s", str);
     l = p = str;
   }
-
   if (l
-  // || (l = p
-  // = bestlineWithHistory("* ", "sectorlisp"))
+  // || (l = p = bestlineWithHistory("* ", "sectorlisp"))
   ) {
     if (*p) {
-      c = *p++ & 255;
+      // c = *p++ & 255;
+      c = *p++;
+      // while (((unsigned int)(c-1)) > 255) {
+      //   c -= 256;
+      // }
     } else {
       // free(l);
       str[0] = 0;
@@ -98,55 +130,58 @@ GetChar() {
   }
 }
 
-PrintChar(b) {
+int PrintChar(b) {
   putchar(b);
-  // fputwc(b, stdout);
 }
 
-GetToken() {
+int GetToken() {
   int c, i = 0;
-  do if ((c = GetChar()) > ' ') RAM[i++] = c;
-  while (c <= ' ' || (c > ')' && dx > ')'));
+  do {if ((c = GetChar()) + COMPCONST > ' ' + COMPCONST) RAM[i++] = c;}
+  while (c + COMPCONST <= ' ' + COMPCONST || (c + COMPCONST > ')' + COMPCONST && dx + COMPCONST > ')' + COMPCONST));
   RAM[i] = 0;
   return c;
 }
 
-AddList(x) {
+int AddList(x) {
   return Cons(x, GetList());
 }
 
-GetList() {
+int GetList() {
+  // printf("GetList\n");
   int c = GetToken();
-  if (c == ')') return 0;
+  if (c == ')') {return 0;}
   return AddList(GetObject(c));
 }
 
-GetObject(c) {
-  if (c == '(') return GetList();
+int GetObject(c) {
+  // printf("GetObject\n");
+  if (c == '(') {return GetList();}
+  // printf("GetObject\n");
   return Intern();
 }
 
-Read() {
+int Read() {
   return GetObject(GetToken());
 }
 
-PrintAtom(x) {
+void PrintAtom(x) {
   int c;
   for (;;) {
-    if (!(c = M[x++])) break;
+    if (!(c = M[x++])) {break;}
     PrintChar(c);
   }
 }
 
-PrintList(x) {
+void PrintObject();
+void PrintList(x) {
   PrintChar('(');
   PrintObject(Car(x));
   while ((x = Cdr(x))) {
-    if (x < 0) {
+    if (x+COMPCONST < 0+COMPCONST) {
       PrintChar(' ');
       PrintObject(Car(x));
     } else {
-      PrintChar(L'∙');
+      PrintChar(L'.');
       PrintObject(x);
       break;
     }
@@ -154,15 +189,15 @@ PrintList(x) {
   PrintChar(')');
 }
 
-PrintObject(x) {
-  if (x < 0) {
+void PrintObject(x) {
+  if (x + COMPCONST< 0 + COMPCONST) {
     PrintList(x);
   } else {
     PrintAtom(x);
   }
 }
 
-Print(e) {
+void Print(e) {
   PrintObject(e);
   PrintChar('\n');
 }
@@ -171,42 +206,44 @@ Print(e) {
 │ The LISP Challenge § Bootstrap John McCarthy's Metacircular Evaluator    ─╬─│┼
 ╚────────────────────────────────────────────────────────────────────────────│*/
 
-Car(x) {
+int Car(x) {
   return M[x];
 }
 
-Cdr(x) {
+int Cdr(x) {
   return M[x + 1];
 }
 
-Cons(car, cdr) {
+int Cons(car, cdr) {
   M[--cx] = cdr;
   M[--cx] = car;
   return cx;
 }
 
-Gc(x, m, k) {
-  return x < m ? Cons(Gc(Car(x), m, k), 
+int Gc(x, m, k) {
+  return x + COMPCONST < m + COMPCONST ? Cons(Gc(Car(x), m, k),
                       Gc(Cdr(x), m, k)) + k : x;
 }
 
-Evlis(m, a) {
+int Evlis(m, a) {
   return m ? Cons(Eval(Car(m), a),
                   Evlis(Cdr(m), a)) : 0;
 }
 
-Pairlis(x, y, a) {
+int Pairlis(x, y, a) {
   return x ? Cons(Cons(Car(x), Car(y)),
                   Pairlis(Cdr(x), Cdr(y), a)) : a;
 }
 
-Assoc(x, y) {
-  if (!y) return 0;
-  if (x == Car(Car(y))) return Cdr(Car(y));
+int Assoc(x, y) {
+  // printf("Assoc");
+  if (!y) {return 0;}
+  if (x == Car(Car(y))) {return Cdr(Car(y));}
   return Assoc(x, Cdr(y));
 }
 
-Evcon(c, a) {
+int Evcon(c, a) {
+
   if (Eval(Car(Car(c)), a)) {
     return Eval(Car(Cdr(Car(c))), a);
   } else {
@@ -214,22 +251,33 @@ Evcon(c, a) {
   }
 }
 
-Apply(f, x, a) {
-  if (f < 0)      return Eval(Car(Cdr(Cdr(f))), Pairlis(Car(Cdr(f)), x, a));
-  if (f > kEq)    return Apply(Eval(f, a), x, a);
-  if (f == kEq)   return Car(x) == Car(Cdr(x)) ? kT : 0;
-  if (f == kCons) return Cons(Car(x), Car(Cdr(x)));
-  if (f == kAtom) return Car(x) < 0 ? 0 : kT;
-  if (f == kCar)  return Car(Car(x));
-  if (f == kCdr)  return Cdr(Car(x));
+int Apply(f, x, a) {
+  if (f+COMPCONST < 0+COMPCONST)      {return Eval(Car(Cdr(Cdr(f))), Pairlis(Car(Cdr(f)), x, a));}
+  if (f+COMPCONST > kEq+COMPCONST)    {return Apply(Eval(f, a), x, a);}
+  if (f == kEq)   {return Car(x) == Car(Cdr(x)) ? kT : 0;}
+  if (f == kCons) {return Cons(Car(x), Car(Cdr(x)));}
+  if (f == kAtom) {return Car(x) + COMPCONST < 0+COMPCONST ? 0 : kT;}
+  if (f == kCar)  {return Car(Car(x));}
+  if (f == kCdr)  {return Cdr(Car(x));}
 }
 
-Eval(e, a) {
+int Eval(int e, int a) {
   int A, B, C;
-  if (e >= 0)
-    return Assoc(e, a);
+  // putchar(Car(e) + '0');
+  // putchar(Car(e) + '0');
+  // putchar('0' + (Car(e) == kQuote));
+  // putchar(e+'0');
+  // putchar(((int)(e+COMPCONST) >= COMPCONST)+'0');
+  // putchar('a');
+  if (e+COMPCONST >= COMPCONST)
+    {
+      // printf("Entering Assoc");
+    return Assoc(e, a);}
+  // printf("Leaving comparison");
   if (Car(e) == kQuote)
-    return Car(Cdr(e));
+    {
+      // printf("kQuote\n");
+      return Car(Cdr(e));}
   A = cx;
   if (Car(e) == kCond) {
     e = Evcon(Cdr(e), a);
@@ -239,8 +287,8 @@ Eval(e, a) {
   B = cx;
   e = Gc(e, A, A - B);
   C = cx;
-  while (C < B)
-    M[--A] = M[--B];
+  while (C+COMPCONST < B+COMPCONST)
+    {M[--A] = M[--B];}
   cx = A;
   return e;
 }
@@ -249,11 +297,11 @@ Eval(e, a) {
 │ The LISP Challenge § User Interface                                      ─╬─│┼
 ╚────────────────────────────────────────────────────────────────────────────│*/
 
-main() {
+int main() {
   int i;
   // setlocale(LC_ALL, "");
   // bestlineSetXlatCallback(bestlineUppercase);
-  for(i = 0; i < sizeof(S); ++i) M[i] = S[i];
+  for(i = 0; i < /*sizeof(S)*/38; ++i) {M[i] = S[i];}
   // for (;;) {
     cx = 0;
     Print(Eval(Read(), 0));
