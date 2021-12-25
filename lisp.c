@@ -16,16 +16,16 @@
 │ TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR             │
 │ PERFORMANCE OF THIS SOFTWARE.                                                │
 ╚─────────────────────────────────────────────────────────────────────────────*/
-#include "bestline.h"
+// #include "bestline.h"
 
-#ifndef __COSMOPOLITAN__
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <locale.h>
-#include <limits.h>
-#endif
+// #ifndef __COSMOPOLITAN__
+// #include <ctype.h>
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <string.h>
+// #include <locale.h>
+// #include <limits.h>
+// #endif
 
 /*───────────────────────────────────────────────────────────────────────────│─╗
 │ The LISP Challenge § LISP Machine                                        ─╬─│┼
@@ -64,14 +64,28 @@ Intern() {
   return x;
 }
 
+char str[4096];
 GetChar() {
   int c, t;
   static char *l, *p;
-  if (l || (l = p = bestlineWithHistory("* ", "sectorlisp"))) {
+  if (!l) {
+    l = str;
+    while((c = getchar()) != -1) {
+      *l = c;
+      l++;
+    }
+    l = p = str;
+  }
+
+  if (l
+  // || (l = p
+  // = bestlineWithHistory("* ", "sectorlisp"))
+  ) {
     if (*p) {
       c = *p++ & 255;
     } else {
-      free(l);
+      // free(l);
+      str[0] = 0;
       l = p = 0;
       c = '\n';
     }
@@ -85,7 +99,8 @@ GetChar() {
 }
 
 PrintChar(b) {
-  fputwc(b, stdout);
+  putchar(b);
+  // fputwc(b, stdout);
 }
 
 GetToken() {
@@ -236,11 +251,11 @@ Eval(e, a) {
 
 main() {
   int i;
-  setlocale(LC_ALL, "");
-  bestlineSetXlatCallback(bestlineUppercase);
+  // setlocale(LC_ALL, "");
+  // bestlineSetXlatCallback(bestlineUppercase);
   for(i = 0; i < sizeof(S); ++i) M[i] = S[i];
-  for (;;) {
+  // for (;;) {
     cx = 0;
     Print(Eval(Read(), 0));
-  }
+  // }
 }
