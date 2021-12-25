@@ -73,7 +73,6 @@ int GetList();
 
 int Intern() {
   int i, j, x;
-  // printf("Intern");
   for (i = 0; (x = M[i++]);) {
     for (j = 0;; ++j) {
       if (x != RAM[j]) {break;}
@@ -100,10 +99,8 @@ int GetChar() {
     l = str;
     while((c = getchar()) != -1) {
       *l = c;
-      // putchar(c);
       l++;
     }
-    // scanf("%s", str);
     l = p = str;
   }
   if (l
@@ -147,16 +144,13 @@ int AddList(x) {
 }
 
 int GetList() {
-  // printf("GetList\n");
   int c = GetToken();
   if (c == ')') {return 0;}
   return AddList(GetObject(c));
 }
 
 int GetObject(c) {
-  // printf("GetObject\n");
   if (c == '(') {return GetList();}
-  // printf("GetObject\n");
   return Intern();
 }
 
@@ -236,7 +230,6 @@ int Pairlis(x, y, a) {
 }
 
 int Assoc(x, y) {
-  // printf("Assoc");
   if (!y) {return 0;}
   if (x == Car(Car(y))) {return Cdr(Car(y));}
   return Assoc(x, Cdr(y));
@@ -252,32 +245,21 @@ int Evcon(c, a) {
 }
 
 int Apply(f, x, a) {
-  if (f+COMPCONST < 0+COMPCONST)      {return Eval(Car(Cdr(Cdr(f))), Pairlis(Car(Cdr(f)), x, a));}
-  if (f+COMPCONST > kEq+COMPCONST)    {return Apply(Eval(f, a), x, a);}
-  if (f == kEq)   {return Car(x) == Car(Cdr(x)) ? kT : 0;}
-  if (f == kCons) {return Cons(Car(x), Car(Cdr(x)));}
-  if (f == kAtom) {return Car(x) + COMPCONST < 0+COMPCONST ? 0 : kT;}
-  if (f == kCar)  {return Car(Car(x));}
-  if (f == kCdr)  {return Cdr(Car(x));}
+  if (f+COMPCONST < 0+COMPCONST)      return Eval(Car(Cdr(Cdr(f))), Pairlis(Car(Cdr(f)), x, a));
+  if (f+COMPCONST > kEq+COMPCONST)    return Apply(Eval(f, a), x, a);
+  if (f == kEq)   return Car(x) == Car(Cdr(x)) ? kT : 0;
+  if (f == kCons) return Cons(Car(x), Car(Cdr(x)));
+  if (f == kAtom) return Car(x) + COMPCONST < 0+COMPCONST ? 0 : kT;
+  if (f == kCar)  return Car(Car(x));
+  if (f == kCdr)  return Cdr(Car(x));
 }
 
 int Eval(int e, int a) {
   int A, B, C;
-  // putchar(Car(e) + '0');
-  // putchar(Car(e) + '0');
-  // putchar('0' + (Car(e) == kQuote));
-  // putchar(e+'0');
-  // putchar(((int)(e+COMPCONST) >= COMPCONST)+'0');
-  // putchar('a');
   if (e+COMPCONST >= COMPCONST)
-    {
-      // printf("Entering Assoc");
-    return Assoc(e, a);}
-  // printf("Leaving comparison");
+    return Assoc(e, a);
   if (Car(e) == kQuote)
-    {
-      // printf("kQuote\n");
-      return Car(Cdr(e));}
+      return Car(Cdr(e));
   A = cx;
   if (Car(e) == kCond) {
     e = Evcon(Cdr(e), a);
@@ -288,7 +270,7 @@ int Eval(int e, int a) {
   e = Gc(e, A, A - B);
   C = cx;
   while (C+COMPCONST < B+COMPCONST)
-    {M[--A] = M[--B];}
+    M[--A] = M[--B];
   cx = A;
   return e;
 }
