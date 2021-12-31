@@ -200,9 +200,7 @@ Pairlis:test	%di,%di				# Pairlis(x:di,y:si,a:dx):dx
 	jnz	1f				# return if x is nil
 	pop	%di
 	mov	(%di),%ax			# car
-  	mov	(%bx,%di),%di			# cdr
-	mov	(%di),%ax			# car
-	jmp	Eval
+	jmp	Evifcdr
 
 1:	lodsw					# ax = Car(y)
 	push	(%bx,%di)			# push Cdr(x)
@@ -265,9 +263,9 @@ Evif:	push	%di				# save c
  	call	Eval
  	pop	%di				# restore c
  	test	%ax,%ax				# nil test
- 	jnz	7f
+	jnz	Evifcdr
 	mov	(%bx,%di),%di			# cdr
-7:  	mov	(%bx,%di),%di			# cdr
+Evifcdr:mov	(%bx,%di),%di			# cdr
 	mov	(%di),%ax			# car
 #	jmp	Eval
 
