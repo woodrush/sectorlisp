@@ -29,7 +29,7 @@ kT:	.asciz	"T"				# add %dl,(%si) boot A:\ DL=0
 start:	ljmp	$0x7c00>>4,$begin		# cs = 0x7c00 is boot address
 	.asciz	""				# interned strings
 kQuote:	.asciz	"QUOTE"				# builtin for eval
-kCond:	.asciz	"COND"				# builtin for eval
+kIf:	.asciz	"IF"				# builtin for eval
 kCar:	.asciz	"CAR"				# builtin to apply
 kCdr:	.asciz	"CDR"				# ordering matters
 kCons:	.asciz	"CONS"				# must be 3rd last
@@ -264,8 +264,8 @@ Eval:	test	%ax,%ax				# Eval(e:ax,a:dx):ax
 	cmp	$kQuote,%ax			# maybe CONS
 	mov	(%si),%di			# di = Cdr(e)
 	je	Car
-	cmp	$kCond,%ax
-	je	Evcon				# ABC Garbage Collector
+	cmp	$kIf,%ax
+	je	Evif				# ABC Garbage Collector
 	push	%dx				# save a
 	push	%cx				# save A
 	push	%ax
@@ -289,7 +289,7 @@ Eval:	test	%ax,%ax				# Eval(e:ax,a:dx):ax
 	.word	0xAA55
 2:	.type	.sig,@object
 	.type	kQuote,@object
-	.type	kCond,@object
+	.type	kIf,@object
 	.type	kAtom,@object
 	.type	kCar,@object
 	.type	kCdr,@object
