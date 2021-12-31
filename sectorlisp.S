@@ -195,13 +195,10 @@ Apply:	test	%ax,%ax				# Apply(fn:ax,x:si:a:dx):ax
 	push	%di				# for .EvCadr
 	mov	(%di),%di			# di = Cadr(fn)
 Pairlis:test	%di,%di				# Pairlis(x:di,y:si,a:dx):dx
-#	jz	.EvCadr				# return if x is nil
-
 	jnz	1f				# return if x is nil
 	pop	%di
 	mov	(%di),%ax			# car
 	jmp	Evifcdr
-
 1:	lodsw					# ax = Car(y)
 	push	(%bx,%di)			# push Cdr(x)
 	mov	(%di),%di			# di = Car(x)
@@ -239,24 +236,10 @@ Assoc:	mov	%dx,%si				# Assoc(x:ax,y:dx):ax
 	mov	(%bx,%si),%si
 	scasw
 	jne	1b
-	jmp	Car
-#	.byte	0xF6				# testb §i8,i16(%bp,%di) jmp Car
-# Cadr:	mov	(%bx,%di),%di			# contents of decrement register
-# 	.byte	0x3C				# cmp §scasw,%al (nop next byte)
+	.byte	0x3C				# cmp $-0x51,%al; bypasses scasw
 Cdr:	scasw					# increments our data index by 2
 Car:	mov	(%di),%ax			# contents of address register!!
 	ret
-
-# 1:	mov	(%bx,%di),%di			# di = Cdr(c)
-# Evcon:	push	%di				# save c
-# 	mov	(%di),%si			# di = Car(c)
-# 	lodsw					# ax = Caar(c)
-# 	call	Eval
-# 	pop	%di				# restore c
-# 	test	%ax,%ax				# nil test
-# 	jz	1b
-# 	push	(%di)				# push Car(c)
-
 
 Evif:	push	%di				# save c
 	mov	(%di),%ax			# car
@@ -267,13 +250,6 @@ Evif:	push	%di				# save c
 	mov	(%bx,%di),%di			# cdr
 Evifcdr:mov	(%bx,%di),%di			# cdr
 	mov	(%di),%ax			# car
-#	jmp	Eval
-
-
-#	.EvCadr:pop	%di
-#		call	Cadr				# ax = Cadar(c)
-#	#	jmp	Eval
-
 Eval:	test	%ax,%ax				# Eval(e:ax,a:dx):ax
 	jz	1f
 	jns	Assoc				# lookup val if atom
