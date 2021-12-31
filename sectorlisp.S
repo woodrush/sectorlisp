@@ -240,15 +240,18 @@ Cdr:	scasw					# increments our data index by 2
 Car:	mov	(%di),%ax			# contents of address register!!
 	ret
 
-1:	mov	(%bx,%di),%di			# di = Cdr(c)
 Evcon:	push	%di				# save c
-	mov	(%di),%si			# di = Car(c)
-	lodsw					# ax = Caar(c)
-	call	Eval
-	pop	%di				# restore c
-	test	%ax,%ax				# nil test
-	jz	1b
-	push	(%di)				# push Car(c)
+	call	Car
+ 	call	Eval
+ 	pop	%di				# restore c
+ 	test	%ax,%ax				# nil test
+ 	jnz	7f
+	mov	(%bx,%di),%di
+7:  	mov	(%bx,%di),%di
+	call	Car
+	jmp	Eval
+
+
 .EvCadr:pop	%di
 	call	Cadr				# ax = Cadar(c)
 #	jmp	Eval
