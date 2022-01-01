@@ -4,6 +4,8 @@ eval10: eval10.lisp qemu.sh tcat
 	sh qemu.sh eval10.lisp
 eval15: eval15.lisp qemu.sh tcat
 	sh qemu.sh eval10.lisp
+meta-in-meta: meta-in-meta.lisp qemu.sh tcat
+	sh qemu.sh meta-in-meta.lisp
 tcat: tcat.c
 	$(CC) -o $@ $< -Wall
 
