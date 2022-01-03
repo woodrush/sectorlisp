@@ -5,6 +5,16 @@
 ;; (50 let n = n - (a))
 ;; (60 print m)
 ;; (70 goto 30)
+
+;; (50 let n = (* * * *) + (*))
+;; (60 print n)
+;; (61 ifzero n then 90)
+;; (62 let n = ())
+;; (65 print (*))
+;; (70 ifzero n then 90)
+;; (80 print n)
+;; (90 print (*))
+;; (100 print (* *))
 ((LAMBDA (EXECLINE CONSINITSTATE CONSSTATE FINDLABELLISTING + - RESOLVEVAR VARENVPREPEND EVALEXPR PRINTINT)
   ;; (RESOLVEVAR
   ;;   (QUOTE N)
@@ -21,15 +31,14 @@
   ((LAMBDA (STATE LOOP) (LOOP STATE LOOP))
     (CONSINITSTATE
       (QUOTE
-        ((50 let n = (* * * *) + (*))
-         (60 print n)
-         (61 ifzero n then 90)
-         (62 let n = ())
-         (65 print (*))
-         (70 ifzero n then 90)
-         (80 print n)
-         (90 print (*))
-         (100 print (* *))
+        (
+          (10 let n = (* * * * *))
+          (20 let m = ())
+          (30 ifzero n then 80)
+          (40 let m = m + (a))
+          (50 let n = n - (a))
+          (60 print m)
+          (70 goto 30)
          )))
     (QUOTE
       (LAMBDA (STATE LOOP)
