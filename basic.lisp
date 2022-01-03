@@ -1,49 +1,78 @@
-(10 let n = (a a a a a))
-(20 let m = ())
-(30 ifzero n then 80)
-(40 let m = m + (a))
-(50 let n = n - (a))
-(60 print m)
-(70 goto 30)
-((LAMBDA (EXECLINE CONSSTATE FINDLABELLISTING + - RESOLVEVAR VARENVPREPEND EVALEXPR PRINTINT)
- (PRINTINT (QUOTE * * * * *))
+;; (10 let n = (a a a a a))
+;; (20 let m = ())
+;; (30 ifzero n then 80)
+;; (40 let m = m + (a))
+;; (50 let n = n - (a))
+;; (60 print m)
+;; (70 goto 30)
+((LAMBDA (EXECLINE CONSINITSTATE CONSSTATE FINDLABELLISTING + - RESOLVEVAR VARENVPREPEND EVALEXPR PRINTINT)
+  (+ (QUOTE (* * *)) (QUOTE (* *)))
+  ;; (EXECLINE (CONSINITSTATE
+  ;;   (QUOTE (
+  ;;     (60 print (* * *))
+  ;;   ))))
+
+  ;; ((LAMBDA (STATE LOOP) (LOOP STATE LOOP))
+  ;;   (CONSINITSTATE
+  ;;     (QUOTE
+  ;;       ((60 print (* * *)))))
+  ;;   (QUOTE
+  ;;     (LAMBDA (STATE LOOP)
+  ;;       (COND
+  ;;         ((EQ NIL (CAR (CDR (CDR STATE)))) NIL)
+  ;;         ((QUOTE T) (LOOP (EXECLINE STATE) LOOP))))))
  )
- ;; EXECLINE: ... -> STATE: Execute line and return the next state
+ ;; EXECLINE: STATE -> STATE: Execute line and return the next state
  (QUOTE
-   (LAMBDA (LABEL STATEMENT BODY VARENV FULLLISTING CURLISTING)
-     (COND
-       ((EQ STATEMENT (QUOTE let))
-        (CONSSTATE
-          ((LAMBDA (VARNAME EXPR)
-             (VARNAMEPREPEND VARNAME (EVALEXPR EXPR) VARENV))
-           (CAR BODY) (CDR (CDR BODY)))
-          FULLLISTING
-          (CDR CURLISTING)))
-       ((EQ STATEMENT (QUOTE ifzero)
-        ((LAMBDA (N DESTLABEL)
+   (LAMBDA (STATE)
+     ((LAMBDA (CURSTATEMENT VARENV FULLLISTING CURLISTING)
+        ((LAMBDA (LABEL STATEMENT BODY)
            (COND
-             ((EQ NIL N)
+             ((EQ STATEMENT (QUOTE let))
+              (CONSSTATE
+                ((LAMBDA (VARNAME EXPR)
+                   (VARNAMEPREPEND VARNAME (EVALEXPR EXPR) VARENV))
+                 (CAR BODY) (CDR (CDR BODY)))
+                FULLLISTING
+                (CDR CURLISTING)))
+             ((EQ STATEMENT (QUOTE ifzero)
+              ((LAMBDA (N DESTLABEL)
+                 (COND
+                   ((EQ NIL N)
+                    (CONSSTATE
+                      VARENV
+                      FULLLISTING
+                      (FINDLABELLISTING LABEL FULLLISTING)))
+                   ((QUOTE T)
+                    (CONSSTATE
+                      VARENV
+                      FULLLISTING
+                      (CDR CURLISTING)))))
+               (RESOLVEVAR (CAR BODY)) (CAR (CDR (CDR BODY))))))
+             ((EQ STATEMENT (QUOTE print))
+              (CDR (CONS (PRINTINT (EVALEXPR BODY))
+                         (CONSSTATE
+                           VARENV
+                           FULLLISTING
+                           (CDR CURLISTING)))))
+             ((EQ STATEMENT (QUOTE goto)
               (CONSSTATE
                 VARENV
                 FULLLISTING
-                (FINDLABELLISTING LABEL FULLLISTING)))
-             ((QUOTE T)
-              (CONSSTATE
-                VARENV
-                FULLLISTING
-                (CDR CURLISTING)))))
-         (RESOLVEVAR (CAR BODY)) (CAR (CDR (CDR BODY))))))
-       ((EQ STATEMENT (QUOTE print))
-        (CDR (CONS (PRINTINT (EVALEXPR BODY))
-                   (CONSSTATE
-                     VARENV
-                     FULLLISTING
-                     (CDR CURLISTING)))))
-       ((EQ STATEMENT (QUOTE goto)
-        (CONSSTATE
-          VARENV
-          FULLLISTING
-          (FINDLABELLISTING (CAR BODY) FULLLISTING)))))))
+                (FINDLABELLISTING (CAR BODY) FULLLISTING))))))
+         (CAR CURLISTING)
+         (CAR (CDR CURLISTING))
+         (CDR (CDR CURLISTING))))
+      (CAR (CAR (CDR (CDR STATE))))
+      (CAR STATE)
+      (CAR (CDR STATE))
+      (CAR (CDR (CDR STATE))))))
+ 
+ 
+ ;; CONSINITSTATE: FULLLISTING -> STATE
+ (QUOTE
+   (LAMBDA (FULLLISTING)
+     (CONS () (CONS FULLLISTING (CONS FULLLISTING ())))))
  
  ;; CONSSTATE: VARENV, FULLLISTING, CURLISTING -> STATE
  (QUOTE
@@ -63,8 +92,8 @@
  (QUOTE
    (LAMBDA (N M)
      (COND
-       ((EQ NIL M)) N)
-       ((QUOTE T) (+ (CONS (QUOTE *) N) (CDR M)))))
+       ((EQ NIL M) N)
+       ((QUOTE T) (+ (CONS (QUOTE *) N) (CDR M))))))
  
  ;; -: INT -> INT: Subtract
  (QUOTE
