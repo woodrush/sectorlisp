@@ -6,9 +6,10 @@
 ;; (60 print m)
 ;; (70 goto 30)
 ((LAMBDA (EXECLINE CONSINITSTATE CONSSTATE FINDLABELLISTING + - RESOLVEVAR VARENVPREPEND EVALEXPR PRINTINT)
-  (RESOLVEVAR
-    (QUOTE N)
-    (VARENVPREPEND (QUOTE M) (QUOTE (* * * *)) (VARENVPREPEND (QUOTE N) (QUOTE (* * *)) ())))
+  ;; (RESOLVEVAR
+  ;;   (QUOTE N)
+  ;;   (VARENVPREPEND (QUOTE M) (QUOTE (* * * *)) (VARENVPREPEND (QUOTE N) (QUOTE (* * *)) ())))
+
   ;; (EVALEXPR (QUOTE ((* * *) - (* *))))
   ;; (- (QUOTE (* * * * *)) (QUOTE (* *)))
 
@@ -17,17 +18,18 @@
   ;;     (60 print (* * *))
   ;;   ))))
 
-  ;; ((LAMBDA (STATE LOOP) (LOOP STATE LOOP))
-  ;;   (CONSINITSTATE
-  ;;     (QUOTE
-  ;;       ((50 let n = (* * * *))
-  ;;        (60 print n)
-  ;;        (70 print (* * * * *)))))
-  ;;   (QUOTE
-  ;;     (LAMBDA (STATE LOOP)
-  ;;       (COND
-  ;;         ((EQ NIL (CAR (CDR (CDR STATE)))) NIL)
-  ;;         ((QUOTE T) (LOOP (EXECLINE STATE) LOOP))))))
+  ((LAMBDA (STATE LOOP) (LOOP STATE LOOP))
+    (CONSINITSTATE
+      (QUOTE
+        ((50 let n = (* * * *))
+        ;;  (60 print n)
+        ;;  (70 print (* * * * *))
+         )))
+    (QUOTE
+      (LAMBDA (STATE LOOP)
+        (COND
+          ((EQ NIL (CAR (CDR (CDR STATE)))) STATE)
+          ((QUOTE T) (LOOP (EXECLINE STATE) LOOP))))))
  )
  ;; EXECLINE: STATE -> STATE: Execute line and return the next state
  (QUOTE
@@ -124,7 +126,8 @@
    (LAMBDA (VARNAME N VARENV)
      (CONS (CONS VARNAME N) VARENV)))
  
- ;; EVALEXPR: EXPR -> INT: Evaluate integer expressions
+ ;; EVALEXPR: EXPR -> INT: Evaluate integer expressions.
+ ;; EXPR is a list even if the input is a single variable or an integer literal.
  (QUOTE
    (LAMBDA (EXPR)
      (COND
