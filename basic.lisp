@@ -6,7 +6,9 @@
 ;; (60 print m)
 ;; (70 goto 30)
 ((LAMBDA (EXECLINE CONSINITSTATE CONSSTATE FINDLABELLISTING + - RESOLVEVAR VARENVPREPEND EVALEXPR PRINTINT)
-  (+ (QUOTE (* * *)) (QUOTE (* *)))
+  (EVALEXPR (QUOTE ((* * *) - (* *))))
+  ;; (- (QUOTE (* * * * *)) (QUOTE (* *)))
+
   ;; (EXECLINE (CONSINITSTATE
   ;;   (QUOTE (
   ;;     (60 print (* * *))
