@@ -6,13 +6,13 @@
 ;; (60 print m)
 ;; (70 goto 30)
 ((LAMBDA (EXECLINE CONSINITSTATE CONSSTATE FINDLABELLISTING + - RESOLVEVAR VARENVPREPEND EVALEXPR PRINTINT)
-  (EVALEXPR (QUOTE ((* * *) - (* *))))
+  ;; (EVALEXPR (QUOTE ((* * *) - (* *))))
   ;; (- (QUOTE (* * * * *)) (QUOTE (* *)))
 
-  ;; (EXECLINE (CONSINITSTATE
-  ;;   (QUOTE (
-  ;;     (60 print (* * *))
-  ;;   ))))
+  (EXECLINE (CONSINITSTATE
+    (QUOTE (
+      (60 print (* * *))
+    ))))
 
   ;; ((LAMBDA (STATE LOOP) (LOOP STATE LOOP))
   ;;   (CONSINITSTATE
@@ -62,9 +62,9 @@
                 VARENV
                 FULLLISTING
                 (FINDLABELLISTING (CAR BODY) FULLLISTING))))))
-         (CAR CURLISTING)
-         (CAR (CDR CURLISTING))
-         (CDR (CDR CURLISTING))))
+         (CAR CURSTATEMENT)
+         (CAR (CDR CURSTATEMENT))
+         (CDR (CDR CURSTATEMENT))))
       (CAR (CAR (CDR (CDR STATE))))
       (CAR STATE)
       (CAR (CDR STATE))
