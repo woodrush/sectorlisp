@@ -1,24 +1,7 @@
-;; (10 let n = (a a a a a))
-;; (20 let m = ())
-;; (30 ifzero n then 80)
-;; (40 let m = m + (a))
-;; (50 let n = n - (a))
-;; (60 print m)
-;; (70 goto 30)
-
-;; (50 let n = (* * * *) + (*))
-;; (60 print n)
-;; (61 ifzero n then 90)
-;; (62 let n = ())
-;; (65 print (*))
-;; (70 ifzero n then 90)
-;; (80 print n)
-;; (90 print (*))
-;; (100 print (* *))
 ((LAMBDA (BASICINTERPRETER)
    (BASICINTERPRETER
      (QUOTE (
-       (10 let n = (* * * * *))
+       (10 let n = (o o o o o))
        (20 let m = ())
        (30 ifzero n then 80)
        (40 let m = m + (a))
@@ -26,23 +9,12 @@
        (60 print m)
        (70 goto 30)
      ))))
+
  (QUOTE
    (LAMBDA (FULLLISTING)
      ((LAMBDA (EXECLINE CONSINITSTATE CONSSTATE FINDLABELLISTING + -
                RESOLVEVAR VARENVPREPEND EVALEXPR PRINTINT
                PRINT ISNOTSECTORLISP APPEND)
-       ;; (RESOLVEVAR
-       ;;   (QUOTE N)
-       ;;   (VARENVPREPEND (QUOTE M) (QUOTE (* * * *)) (VARENVPREPEND (QUOTE N) (QUOTE (* * *)) ())))
-
-       ;; (EVALEXPR (QUOTE ((* * *) - (* *))))
-       ;; (- (QUOTE (* * * * *)) (QUOTE (* *)))
-
-       ;; (EXECLINE (CONSINITSTATE
-       ;;   (QUOTE (
-       ;;     (60 print (* * *))
-       ;;   ))))
-
        ((LAMBDA (STATE LOOP) (LOOP STATE LOOP))
          (CONSINITSTATE FULLLISTING)
          (QUOTE
@@ -52,8 +24,8 @@
                 (COND
                   (ISNOTSECTORLISP NIL)
                   ((QUOTE T) (CAR (CDR (CDR (CDR STATE)))))))
-               ((QUOTE T) (LOOP (EXECLINE STATE) LOOP))))))
-      )
+               ((QUOTE T) (LOOP (EXECLINE STATE) LOOP)))))))
+
       ;; EXECLINE: STATE -> STATE: Execute line and return the next state
       (QUOTE
         (LAMBDA (STATE)
@@ -103,7 +75,6 @@
            (CAR (CDR (CDR STATE)))
            (CAR (CDR (CDR (CDR STATE)))))))
 
-
       ;; CONSINITSTATE: FULLLISTING -> STATE
       (QUOTE
         (LAMBDA (FULLLISTING)
@@ -129,7 +100,7 @@
         (LAMBDA (N M)
           (COND
             ((EQ NIL M) N)
-            ((QUOTE T) (+ (CONS (QUOTE *) N) (CDR M))))))
+            ((QUOTE T) (+ (CONS (QUOTE o) N) (CDR M))))))
 
       ;; -: INT -> INT: Subtract
       (QUOTE
@@ -179,7 +150,7 @@
              (LAMBDA (N)
                (COND
                  ((EQ NIL N) ())
-                 ((QUOTE T) (CONS (PRINT (QUOTE *)) (PRINTINTBODY (CDR N))))))))))
+                 ((QUOTE T) (CONS (PRINT (QUOTE o)) (PRINTINTBODY (CDR N))))))))))
 
      ;; PRINT: X -> X: For compatibility with the original SectorLISP
      (QUOTE
