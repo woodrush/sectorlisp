@@ -23,8 +23,10 @@
       (QUOTE
         ((50 let n = (* * * *) + (*))
          (60 print n)
+         (61 ifzero n then 90)
+         (62 let n = ())
          (65 print (*))
-         (70 goto 90)
+         (70 ifzero n then 90)
          (80 print n)
          (90 print (*))
          (100 print (* *))
@@ -54,11 +56,11 @@
                    VARENV
                    FULLLISTING
                    (COND
-                     ((EQ NIL (EVALEXPR (CONS N NIL) VARENV))
-                      (FINDLABELLISTING LABEL FULLLISTING))
+                     ((EQ NIL N)
+                      (FINDLABELLISTING DESTLABEL FULLLISTING))
                      ((QUOTE T)
                       (CDR CURLISTING)))))
-               (RESOLVEVAR (CAR BODY)) (CAR (CDR (CDR BODY)))))
+               (RESOLVEVAR (CAR BODY) VARENV) (CAR (CDR (CDR BODY)))))
              ((EQ STATEMENT (QUOTE print))
               (CDR (CONS (PRINTINT (EVALEXPR BODY VARENV))
                          (CONSSTATE
@@ -73,7 +75,7 @@
          (CAR CURSTATEMENT)
          (CAR (CDR CURSTATEMENT))
          (CDR (CDR CURSTATEMENT))))
-      (PRINT (CAR (CAR (CDR (CDR STATE)))))
+      (CAR (CAR (CDR (CDR STATE))))
       (CAR STATE)
       (CAR (CDR STATE))
       (CAR (CDR (CDR STATE))))))
@@ -133,7 +135,7 @@
  (QUOTE
    (LAMBDA (EXPR VARENV)
      (COND
-       ((EQ NIL (CDR EXPR)) (PRINT (RESOLVEVAR (CAR EXPR) VARENV)))
+       ((EQ NIL (CDR EXPR)) (RESOLVEVAR (CAR EXPR) VARENV))
        ((QUOTE T)
         ((LAMBDA (X OPERAND Y)
            (COND
