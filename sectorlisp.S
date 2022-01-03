@@ -28,6 +28,8 @@ _start:	.asciz	"NIL"				# dec %si ; dec %cx ; dec %sp
 kT:	.asciz	"T"				# add %dl,(%si) boot A:\ DL=0
 start:	ljmp	$0x7c00>>4,$begin		# cs = 0x7c00 is boot address
 	.asciz	""				# interned strings
+kRead:	.asciz	"READ"				# builtin for eval
+kPrint:	.asciz	"PRINT"				# builtin for eval
 kQuote:	.asciz	"QUOTE"				# builtin for eval
 kCond:	.asciz	"COND"				# builtin for eval
 kCar:	.asciz	"CAR"				# builtin to apply
@@ -53,11 +55,8 @@ begin:	mov	$0x8000,%sp			# uses higher address as stack
 main:	mov	%sp,%cx
 	mov	$'\r',%al
 	call	PutChar
-	call	GetToken
-	call	GetObject
-	call	Eval
-	xchg	%ax,%si
-	call	PrintObject
+	call	Read
+	call	EvalPrint
 	jmp	main
 
 GetToken:					# GetToken():al, dl is g_look
@@ -105,6 +104,8 @@ PrintObject:					# PrintObject(x:si)
 	jnz	.PrintString			# -> ret
 	ret
 
+Read:	call	GetChar
+	call	GetToken
 GetObject:					# called just after GetToken
 	cmp	$'(',%al
 	je	GetList
@@ -141,6 +142,18 @@ PutChar:mov	$0x0e,%ah			# prints CP-437
 	mov	$'\n',%al
 	jmp	PutChar
 .RetDx:	xchg	%dx,%ax
+	ret
+
+Print:	mov	(%si),%si			# si = Cdr(e)
+	mov	(%si),%ax			# ax = Car(Cdr(e))
+EvalPrint:
+	call	Eval
+	push	%ax
+	push	%dx
+	xchg	%ax,%si
+	call	PrintObject
+	pop	%dx
+	pop	%ax
 	ret
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -258,6 +271,10 @@ Eval:	test	%ax,%ax				# Eval(e:ax,a:dx):ax
 	jns	Assoc				# lookup val if atom
 	xchg	%ax,%si				# di = e
 	lodsw					# ax = Car(e)
+	cmp	$kRead,%ax
+	je	Read
+	cmp	$kPrint,%ax
+	je	Print
 	cmp	$kQuote,%ax			# maybe CONS
 	mov	(%si),%di			# di = Cdr(e)
 	je	Car
