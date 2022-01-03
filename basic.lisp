@@ -21,12 +21,10 @@
   ((LAMBDA (STATE LOOP) (LOOP STATE LOOP))
     (CONSINITSTATE
       (QUOTE
-        ((50 let n = (* * * *))
-         (70 print n)
-         (60 print (* * * * *))
-         (60 print (* *))
-         (60 print (* * * *))
-         (60 print (*))
+        ((50 let n = (* * * *) + (*))
+         (60 print n)
+         (70 let n = n + n)
+         (80 print n)
          )))
     (QUOTE
       (LAMBDA (STATE LOOP)
@@ -49,16 +47,13 @@
                 (CDR CURLISTING)))
              ((EQ STATEMENT (QUOTE ifzero))
               ((LAMBDA (N DESTLABEL)
-                 (COND
-                   ((EQ NIL N)
-                    (CONSSTATE
-                      VARENV
-                      FULLLISTING
-                      (FINDLABELLISTING LABEL FULLLISTING)))
-                   ((QUOTE T)
-                    (CONSSTATE
-                      VARENV
-                      FULLLISTING
+                 (CONSSTATE
+                   VARENV
+                   FULLLISTING
+                   (COND
+                     ((EQ NIL (EVALEXPR (CONS N NIL) VARENV))
+                      (FINDLABELLISTING LABEL FULLLISTING))
+                     ((QUOTE T)
                       (CDR CURLISTING)))))
                (RESOLVEVAR (CAR BODY)) (CAR (CDR (CDR BODY)))))
              ((EQ STATEMENT (QUOTE print))
