@@ -23,8 +23,11 @@
       (QUOTE
         ((50 let n = (* * * *) + (*))
          (60 print n)
-         (70 let n = n + n)
+         (65 print (*))
+         (70 goto 90)
          (80 print n)
+         (90 print (*))
+         (100 print (* *))
          )))
     (QUOTE
       (LAMBDA (STATE LOOP)
@@ -62,15 +65,15 @@
                            VARENV
                            FULLLISTING
                            (CDR CURLISTING)))))
-             ((EQ STATEMENT (QUOTE goto)
+             ((EQ STATEMENT (QUOTE goto))
               (CONSSTATE
                 VARENV
                 FULLLISTING
-                (FINDLABELLISTING (CAR BODY) FULLLISTING))))))
+                (FINDLABELLISTING (CAR BODY) FULLLISTING)))))
          (CAR CURSTATEMENT)
          (CAR (CDR CURSTATEMENT))
          (CDR (CDR CURSTATEMENT))))
-      (CAR (CAR (CDR (CDR STATE))))
+      (PRINT (CAR (CAR (CDR (CDR STATE)))))
       (CAR STATE)
       (CAR (CDR STATE))
       (CAR (CDR (CDR STATE))))))
@@ -92,8 +95,9 @@
  (QUOTE
    (LAMBDA (LABEL CURLISTING)
      (COND
-       ((EQ (CAR (CAR CURLISTING)) LABEL) (CURLISTING))
-       ((QUOTE T) (FINDBYLABEL LABEL (CDR CURLISTING))))))
+       ((EQ NIL CURLISTING) NIL)
+       ((EQ (CAR (CAR CURLISTING)) LABEL) CURLISTING)
+       ((QUOTE T) (FINDLABELLISTING LABEL (CDR CURLISTING))))))
  
  ;; +: INT -> INT: Add
  (QUOTE
