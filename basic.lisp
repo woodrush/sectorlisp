@@ -15,7 +15,7 @@
 ;; (80 print n)
 ;; (90 print (*))
 ;; (100 print (* *))
-((LAMBDA (EXECLINE CONSINITSTATE CONSSTATE FINDLABELLISTING + - RESOLVEVAR VARENVPREPEND EVALEXPR PRINTINT)
+((LAMBDA (EXECLINE CONSINITSTATE CONSSTATE FINDLABELLISTING + - RESOLVEVAR VARENVPREPEND EVALEXPR PRINTINT PRINT)
   ;; (RESOLVEVAR
   ;;   (QUOTE N)
   ;;   (VARENVPREPEND (QUOTE M) (QUOTE (* * * *)) (VARENVPREPEND (QUOTE N) (QUOTE (* * *)) ())))
@@ -43,13 +43,13 @@
     (QUOTE
       (LAMBDA (STATE LOOP)
         (COND
-          ((EQ NIL (CAR (CDR (CDR STATE)))) STATE)
+          ((EQ NIL (CAR (CDR (CDR STATE)))) (CAR (CDR (CDR (CDR STATE)))))
           ((QUOTE T) (LOOP (EXECLINE STATE) LOOP))))))
  )
  ;; EXECLINE: STATE -> STATE: Execute line and return the next state
  (QUOTE
    (LAMBDA (STATE)
-     ((LAMBDA (CURSTATEMENT VARENV FULLLISTING CURLISTING)
+     ((LAMBDA (CURSTATEMENT VARENV FULLLISTING CURLISTING OUTPUT)
         ((LAMBDA (LABEL STATEMENT BODY)
            (COND
              ((EQ STATEMENT (QUOTE let))
@@ -58,7 +58,8 @@
                    (VARENVPREPEND VARNAME (EVALEXPR EXPR VARENV) VARENV))
                  (CAR BODY) (CDR (CDR BODY)))
                 FULLLISTING
-                (CDR CURLISTING)))
+                (CDR CURLISTING)
+                OUTPUT))
              ((EQ STATEMENT (QUOTE ifzero))
               ((LAMBDA (N DESTLABEL)
                  (CONSSTATE
@@ -68,37 +69,42 @@
                      ((EQ NIL N)
                       (FINDLABELLISTING DESTLABEL FULLLISTING))
                      ((QUOTE T)
-                      (CDR CURLISTING)))))
+                      (CDR CURLISTING)))
+                   OUTPUT))
                (RESOLVEVAR (CAR BODY) VARENV) (CAR (CDR (CDR BODY)))))
              ((EQ STATEMENT (QUOTE print))
-              (CDR (CONS (PRINTINT (EVALEXPR BODY VARENV))
-                         (CONSSTATE
-                           VARENV
-                           FULLLISTING
-                           (CDR CURLISTING)))))
+              ((LAMBDA (NEWOUTPUT)
+                 (CONSSTATE
+                   VARENV
+                   FULLLISTING
+                   (CDR CURLISTING)
+                   (CONS NEWOUTPUT OUTPUT)))
+               (PRINTINT (EVALEXPR BODY VARENV))))
              ((EQ STATEMENT (QUOTE goto))
               (CONSSTATE
                 VARENV
                 FULLLISTING
-                (FINDLABELLISTING (CAR BODY) FULLLISTING)))))
+                (FINDLABELLISTING (CAR BODY) FULLLISTING)
+                OUTPUT))))
          (CAR CURSTATEMENT)
          (CAR (CDR CURSTATEMENT))
          (CDR (CDR CURSTATEMENT))))
       (CAR (CAR (CDR (CDR STATE))))
       (CAR STATE)
       (CAR (CDR STATE))
-      (CAR (CDR (CDR STATE))))))
+      (CAR (CDR (CDR STATE)))
+      (CAR (CDR (CDR (CDR STATE)))))))
  
  
  ;; CONSINITSTATE: FULLLISTING -> STATE
  (QUOTE
    (LAMBDA (FULLLISTING)
-     (CONS () (CONS FULLLISTING (CONS FULLLISTING ())))))
+     (CONS () (CONS FULLLISTING (CONS FULLLISTING (CONS () ()))))))
  
  ;; CONSSTATE: VARENV, FULLLISTING, CURLISTING -> STATE
  (QUOTE
-   (LAMBDA (VARENV FULLLISTING CURLISTING)
-     (CONS VARENV (CONS FULLLISTING (CONS CURLISTING ())))))
+   (LAMBDA (VARENV FULLLISTING CURLISTING OUTPUT)
+     (CONS VARENV (CONS FULLLISTING (CONS CURLISTING (CONS OUTPUT ()))))))
  
  ;; FINDLABELLISTING: LABEL, FULLLISTING -> CURLISTING:
  ;; Find the listing for a given label,
@@ -158,7 +164,8 @@
      ((LAMBDA (PRINTINTBODY)
         (CONS (PRINT (QUOTE [))
         (CONS (PRINTINTBODY N)
-              (PRINT (QUOTE ])))))
+        (CONS (PRINT (QUOTE ]))
+              NIL))))
       ;; PRINTINTBODY: INT -> VOID: Helper function for PRINTINT
       (QUOTE
         (LAMBDA (N)
@@ -166,6 +173,8 @@
             ((EQ NIL N) ())
             ((QUOTE T) (CONS (PRINT (QUOTE *)) (PRINTINTBODY (CDR N))))))))))
 
-
+;; PRINT: X -> X: For compatibility with the original SectorLISP
+(QUOTE
+  (LAMBDA (X) X))
 
  )
