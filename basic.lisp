@@ -9,20 +9,21 @@
   ;; (EVALEXPR (QUOTE ((* * *) - (* *))))
   ;; (- (QUOTE (* * * * *)) (QUOTE (* *)))
 
-  (EXECLINE (CONSINITSTATE
-    (QUOTE (
-      (60 print (* * *))
-    ))))
+  ;; (EXECLINE (CONSINITSTATE
+  ;;   (QUOTE (
+  ;;     (60 print (* * *))
+  ;;   ))))
 
-  ;; ((LAMBDA (STATE LOOP) (LOOP STATE LOOP))
-  ;;   (CONSINITSTATE
-  ;;     (QUOTE
-  ;;       ((60 print (* * *)))))
-  ;;   (QUOTE
-  ;;     (LAMBDA (STATE LOOP)
-  ;;       (COND
-  ;;         ((EQ NIL (CAR (CDR (CDR STATE)))) NIL)
-  ;;         ((QUOTE T) (LOOP (EXECLINE STATE) LOOP))))))
+  ((LAMBDA (STATE LOOP) (LOOP STATE LOOP))
+    (CONSINITSTATE
+      (QUOTE
+        ((60 print (* * *))
+         (70 print (* * * * *)))))
+    (QUOTE
+      (LAMBDA (STATE LOOP)
+        (COND
+          ((EQ NIL (CAR (CDR (CDR STATE)))) NIL)
+          ((QUOTE T) (LOOP (EXECLINE STATE) LOOP))))))
  )
  ;; EXECLINE: STATE -> STATE: Execute line and return the next state
  (QUOTE
