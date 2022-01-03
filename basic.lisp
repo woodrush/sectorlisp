@@ -8,11 +8,15 @@
        (50 let n = n - (a))
        (60 print m)
        (70 goto 30)
+       (80 print (o o o o o o o o) % (o o o))
+       (90 print (o o o) < (o o))
+       (100 print (o o) < (o o))
+       (110 print (o o) < (o o o))
      ))))
 
  (QUOTE
    (LAMBDA (FULLLISTING)
-     ((LAMBDA (EXECLINE CONSINITSTATE CONSSTATE FINDLABELLISTING + -
+     ((LAMBDA (EXECLINE CONSINITSTATE CONSSTATE FINDLABELLISTING + - % <
                RESOLVEVAR VARENVPREPEND EVALEXPR PRINTINT
                PRINT ISNOTSECTORLISP APPEND)
        ((LAMBDA (STATE LOOP) (LOOP STATE LOOP))
@@ -110,6 +114,21 @@
             ((EQ NIL M) N)
             ((QUOTE T) (- (CDR N) (CDR M))))))
 
+      ;; %: INT -> INT: Mod
+      (QUOTE
+        (LAMBDA (N M)
+          (COND
+            ((< N M) N)
+            ((QUOTE T) (% (- N M) M)))))
+
+      ;; <: INT -> INT: Less than
+      (QUOTE
+        (LAMBDA (N M)
+          (COND
+            ((EQ NIL (- N M)) (COND ((EQ NIL (- M N)) NIL)
+                                    ((QUOTE T) (QUOTE (o)))))
+            ((QUOTE T) NIL))))
+
       ;; RESOLVEVAR: VAR/INT, VARENV -> INT: Resolve the integer value of a variable
       (QUOTE
         (LAMBDA (VARNAME VARENV)
@@ -133,9 +152,13 @@
             ((QUOTE T)
              ((LAMBDA (X OPERAND Y)
                 (COND
-                  ((EQ OPERAND (QUOTE +)) (+ (RESOLVEVAR X VARENV) (RESOLVEVAR Y VARENV)))
-                  ((EQ OPERAND (QUOTE -)) (- (RESOLVEVAR X VARENV) (RESOLVEVAR Y VARENV)))))
-              (CAR EXPR) (CAR (CDR EXPR)) (CAR (CDR (CDR EXPR))))))))
+                  ((EQ OPERAND (QUOTE +)) (+ X Y))
+                  ((EQ OPERAND (QUOTE -)) (- X Y))
+                  ((EQ OPERAND (QUOTE %)) (% X Y))
+                  ((EQ OPERAND (QUOTE <)) (< X Y))))
+              (RESOLVEVAR (CAR EXPR) VARENV)
+              (CAR (CDR EXPR))
+              (RESOLVEVAR (CAR (CDR (CDR EXPR))) VARENV))))))
 
       ;; PRINTINT: INT -> VOID: Print integer value in unary
       (QUOTE
