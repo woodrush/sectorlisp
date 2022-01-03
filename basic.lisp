@@ -22,8 +22,11 @@
     (CONSINITSTATE
       (QUOTE
         ((50 let n = (* * * *))
-        ;;  (60 print n)
-        ;;  (70 print (* * * * *))
+         (70 print n)
+         (60 print (* * * * *))
+         (60 print (* *))
+         (60 print (* * * *))
+         (60 print (*))
          )))
     (QUOTE
       (LAMBDA (STATE LOOP)
@@ -40,11 +43,11 @@
              ((EQ STATEMENT (QUOTE let))
               (CONSSTATE
                 ((LAMBDA (VARNAME EXPR)
-                   (VARENVPREPEND VARNAME (EVALEXPR EXPR) VARENV))
+                   (VARENVPREPEND VARNAME (EVALEXPR EXPR VARENV) VARENV))
                  (CAR BODY) (CDR (CDR BODY)))
                 FULLLISTING
                 (CDR CURLISTING)))
-             ((EQ STATEMENT (QUOTE ifzero)
+             ((EQ STATEMENT (QUOTE ifzero))
               ((LAMBDA (N DESTLABEL)
                  (COND
                    ((EQ NIL N)
@@ -57,9 +60,9 @@
                       VARENV
                       FULLLISTING
                       (CDR CURLISTING)))))
-               (RESOLVEVAR (CAR BODY)) (CAR (CDR (CDR BODY))))))
+               (RESOLVEVAR (CAR BODY)) (CAR (CDR (CDR BODY)))))
              ((EQ STATEMENT (QUOTE print))
-              (CDR (CONS (PRINTINT (EVALEXPR BODY))
+              (CDR (CONS (PRINTINT (EVALEXPR BODY VARENV))
                          (CONSSTATE
                            VARENV
                            FULLLISTING
@@ -126,17 +129,17 @@
    (LAMBDA (VARNAME N VARENV)
      (CONS (CONS VARNAME N) VARENV)))
  
- ;; EVALEXPR: EXPR -> INT: Evaluate integer expressions.
+ ;; EVALEXPR: EXPR, VARENV -> INT: Evaluate integer expressions.
  ;; EXPR is a list even if the input is a single variable or an integer literal.
  (QUOTE
-   (LAMBDA (EXPR)
+   (LAMBDA (EXPR VARENV)
      (COND
-       ((EQ NIL (CDR EXPR)) (RESOLVEVAR (CAR EXPR)))
+       ((EQ NIL (CDR EXPR)) (PRINT (RESOLVEVAR (CAR EXPR) VARENV)))
        ((QUOTE T)
         ((LAMBDA (X OPERAND Y)
            (COND
-             ((EQ OPERAND (QUOTE +)) (+ (RESOLVEVAR X) (RESOLVEVAR Y)))
-             ((EQ OPERAND (QUOTE -)) (- (RESOLVEVAR X) (RESOLVEVAR Y)))))
+             ((EQ OPERAND (QUOTE +)) (+ (RESOLVEVAR X VARENV) (RESOLVEVAR Y VARENV)))
+             ((EQ OPERAND (QUOTE -)) (- (RESOLVEVAR X VARENV) (RESOLVEVAR Y VARENV)))))
          (CAR EXPR) (CAR (CDR EXPR)) (CAR (CDR (CDR EXPR))))))))
  
  ;; PRINTINT: INT -> VOID: Print integer value in unary
