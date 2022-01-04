@@ -2,14 +2,14 @@
    (BASICINTERPRETER
      (QUOTE (
        (10   let n_max = (o o o o o o o o o o
-                          o o o o o          )     )
+                          o o o o o)               )
        (20   let i = (o)                           )
-       (30   if (n_max <= i) then 170              )
+       (30   if n_max <= i then 170                )
        (40       let i = i + (o)                   )
        (50       let j = (o o)                     )
-       (70       if (i <= j) then 120              )
+       (70       if i <= j then 120                )
        (80           let r = i % j                 )
-       (90           if (r <= ()) then 30          )
+       (90           if r <= () then 30            )
        (100          let j = j + (o)               )
        (110      goto 70                           )
        (120      print i                           )
@@ -19,7 +19,7 @@
  (QUOTE
    (LAMBDA (FULLLISTING)
      ((LAMBDA (EXECLINE CONSINITSTATE CONSSTATE FINDLABELLISTING + - % <=
-               RESOLVEVAR VARENVPREPEND EVALEXPR PRINTINT
+               RESOLVEVAR VARENVPREPEND EVALEXPR PRINTINT PARSEIF
                PRINT HASPRINT APPEND)
        ((LAMBDA (STATE LOOP) (LOOP STATE LOOP))
          (CONSINITSTATE FULLLISTING)
@@ -47,17 +47,20 @@
                      (CDR CURLISTING)
                      OUTPUT))
                   ((EQ STATEMENT (QUOTE if))
-                   ((LAMBDA (N DESTLABEL)
-                      (CONSSTATE
-                        VARENV
-                        FULLLISTING
-                        (COND
-                          ((EQ NIL N)
-                           (CDR CURLISTING))
-                          ((QUOTE T)
-                           (FINDLABELLISTING DESTLABEL FULLLISTING)))
-                        OUTPUT))
-                    (EVALEXPR (CAR BODY) VARENV) (CAR (CDR (CDR BODY)))))
+                   ((LAMBDA (IFBODY)
+                      ((LAMBDA (N DESTLABEL)
+                       (CONSSTATE
+                         VARENV
+                         FULLLISTING
+                         (COND
+                           ((EQ NIL N)
+                            (CDR CURLISTING))
+                           ((QUOTE T)
+                            (FINDLABELLISTING DESTLABEL FULLLISTING)))
+                         OUTPUT))
+                       (EVALEXPR (CAR IFBODY) VARENV)
+                       (CDR IFBODY)))
+                    (PARSEIF BODY)))
                   ((EQ STATEMENT (QUOTE print))
                    ((LAMBDA (NEWOUTPUT)
                       (CONSSTATE
@@ -175,6 +178,21 @@
                (COND
                  ((EQ NIL N) ())
                  ((QUOTE T) (CONS (PRINT (QUOTE o)) (PRINTINTBODY (CDR N))))))))))
+
+     ;; PARSEIF: Parses `if` statements
+     (QUOTE
+       (LAMBDA (BODY)
+         (COND
+           ((EQ (CAR (CDR BODY)) (QUOTE then))
+            (CONS (CONS (CAR BODY) NIL)
+                  (CAR (CDR (CDR BODY)))))
+           ((QUOTE T)
+            (CONS
+              (CONS (CAR BODY)
+              (CONS (CAR (CDR BODY))
+              (CONS (CAR (CDR (CDR BODY)))
+                    ())))
+              (CAR (CDR (CDR (CDR (CDR BODY))))))))))
 
      ;; PRINT: X -> X: For compatibility with the original SectorLISP
      (QUOTE
