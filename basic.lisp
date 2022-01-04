@@ -1,24 +1,26 @@
 ((LAMBDA (BASICINTERPRETER)
    (BASICINTERPRETER
      (QUOTE (
-       (10 let n = (o o o o o))
-       (20 let m = ())
-       (30 ifzero n then 80)
-       (40 let m = m + (a))
-       (50 let n = n - (a))
-       (60 print m)
-       (70 goto 30)
-       (80 print (o o o o o o o o) % (o o o))
-       (90 print (o o o) < (o o))
-       (100 print (o o) < (o o))
-       (110 print (o o) < (o o o))
+       (10   let n_max = (o o o o o o o o o o
+                          o o o o o          )     )
+       (20   let i = (o)                           )
+       (30   if (n_max <= i) then 170              )
+       (40       let i = i + (o)                   )
+       (50       let j = (o o)                     )
+       (70       if (i <= j) then 120              )
+       (80           let r = i % j                 )
+       (90           if (r <= ()) then 30          )
+       (100          let j = j + (o)               )
+       (110      goto 70                           )
+       (120      print i                           )
+       (130  goto 30                               )
      ))))
 
  (QUOTE
    (LAMBDA (FULLLISTING)
-     ((LAMBDA (EXECLINE CONSINITSTATE CONSSTATE FINDLABELLISTING + - % <
+     ((LAMBDA (EXECLINE CONSINITSTATE CONSSTATE FINDLABELLISTING + - % <=
                RESOLVEVAR VARENVPREPEND EVALEXPR PRINTINT
-               PRINT ISNOTSECTORLISP APPEND)
+               PRINT HASPRINT APPEND)
        ((LAMBDA (STATE LOOP) (LOOP STATE LOOP))
          (CONSINITSTATE FULLLISTING)
          (QUOTE
@@ -26,7 +28,7 @@
              (COND
                ((EQ NIL (CAR (CDR (CDR STATE))))
                 (COND
-                  (ISNOTSECTORLISP NIL)
+                  (HASPRINT NIL)
                   ((QUOTE T) (CAR (CDR (CDR (CDR STATE)))))))
                ((QUOTE T) (LOOP (EXECLINE STATE) LOOP)))))))
 
@@ -44,18 +46,18 @@
                      FULLLISTING
                      (CDR CURLISTING)
                      OUTPUT))
-                  ((EQ STATEMENT (QUOTE ifzero))
+                  ((EQ STATEMENT (QUOTE if))
                    ((LAMBDA (N DESTLABEL)
                       (CONSSTATE
                         VARENV
                         FULLLISTING
                         (COND
                           ((EQ NIL N)
-                           (FINDLABELLISTING DESTLABEL FULLLISTING))
+                           (CDR CURLISTING))
                           ((QUOTE T)
-                           (CDR CURLISTING)))
+                           (FINDLABELLISTING DESTLABEL FULLLISTING)))
                         OUTPUT))
-                    (RESOLVEVAR (CAR BODY) VARENV) (CAR (CDR (CDR BODY)))))
+                    (EVALEXPR (CAR BODY) VARENV) (CAR (CDR (CDR BODY)))))
                   ((EQ STATEMENT (QUOTE print))
                    ((LAMBDA (NEWOUTPUT)
                       (CONSSTATE
@@ -118,15 +120,14 @@
       (QUOTE
         (LAMBDA (N M)
           (COND
-            ((< N M) N)
+            ((<= N (- M (QUOTE (o)))) N)
             ((QUOTE T) (% (- N M) M)))))
 
-      ;; <: INT -> INT: Less than
+      ;; <=: INT -> INT: Less than
       (QUOTE
         (LAMBDA (N M)
           (COND
-            ((EQ NIL (- N M)) (COND ((EQ NIL (- M N)) NIL)
-                                    ((QUOTE T) (QUOTE (o)))))
+            ((EQ NIL (- N M)) (QUOTE (o)))
             ((QUOTE T) NIL))))
 
       ;; RESOLVEVAR: VAR/INT, VARENV -> INT: Resolve the integer value of a variable
@@ -155,7 +156,7 @@
                   ((EQ OPERAND (QUOTE +)) (+ X Y))
                   ((EQ OPERAND (QUOTE -)) (- X Y))
                   ((EQ OPERAND (QUOTE %)) (% X Y))
-                  ((EQ OPERAND (QUOTE <)) (< X Y))))
+                  ((EQ OPERAND (QUOTE <=)) (<= X Y))))
               (RESOLVEVAR (CAR EXPR) VARENV)
               (CAR (CDR EXPR))
               (RESOLVEVAR (CAR (CDR (CDR EXPR))) VARENV))))))
@@ -179,7 +180,7 @@
      (QUOTE
        (LAMBDA (X) X))
 
-     ;; ISSECTORLISP: Check if PRINT is a reserved keyword
+     ;; HASPRINT: Check if PRINT is a reserved keyword
      ((LAMBDA (PRINT)
         (PRINT))
       (QUOTE (LAMBDA () NIL)))
