@@ -1,0 +1,43 @@
+((LAMBDA (GAMELOOP - <= AND CMP)
+   (CAR (CONS (QUOTE (THE GAME HAS FINISHED.))
+        (CONS (PRINT (QUOTE (LET'S PLAY A NUMBER GUESSING GAME.
+                             I AM THINKING OF A CERTAIN NUMBER BETWEEN 1 AND 10.
+                             SAY A NUMBER, AND I'LL TELL YOU IF IT'S LESS THAN, GREATER THAN, OR EQUAL TO MY NUMBER.
+                             CAN YOU GUESS WHAT NUMBER I AM THINKING OF?
+                             INPUT YOUR NUMBER IN UNARY. FOR EXAMPLE, 1 IS (*), 3 IS (* * *), ETC.)))
+              (GAMELOOP ())))))
+ (QUOTE (LAMBDA (NUMTRIES)
+          (CONS (PRINT (QUOTE NUMBER>))
+                ((LAMBDA (GUESS ANSWER NUMTRIES)
+                   (COND
+                     ((EQ (QUOTE <) (CMP GUESS ANSWER))
+                      (CONS (PRINT (QUOTE (YOUR GUESS IS LESS THAN MY NUMBER.)))
+                            (GAMELOOP NUMTRIES)))
+                     ((EQ (QUOTE >) (CMP GUESS ANSWER))
+                      (CONS (PRINT (QUOTE (YOUR GUESS IS GREATER THAN MY NUMBER.)))
+                            (GAMELOOP NUMTRIES)))
+                     ((QUOTE T)
+                      (CONS (PRINT (QUOTE (CORRECT! MY NUMBER IS:)))
+                      (CONS (PRINT ANSWER)
+                      (CONS (PRINT (QUOTE (YOU GUESSED CORRECTLY! CONGRATULATIONS!)))
+                      (CONS (PRINT (QUOTE (NUMBER OF TRIES:)))
+                            (PRINT NUMTRIES))))))))
+                 (READ)
+                 (QUOTE (* * * * * * *))
+                 (CONS (QUOTE *) NUMTRIES)))))
+ (QUOTE (LAMBDA (N M)
+          (COND
+            ((EQ N NIL) NIL)
+            ((EQ M NIL) N)
+            ((QUOTE T) (- (CDR N) (CDR M))))))
+ (QUOTE (LAMBDA (N M) (EQ NIL (- N M))))
+ (QUOTE (LAMBDA (X Y) (COND (X Y) ((QUOTE T) NIL))))
+ (QUOTE (LAMBDA (N M)
+          (COND ((AND (<= N M) (<= M N)) (QUOTE ==))
+                ((<= N M) (QUOTE <))
+                ((<= M N) (QUOTE >)))))
+          )
+
+(* * *)
+(* * * * * * * *)
+(* * * * * * *)
