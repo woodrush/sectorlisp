@@ -1,7 +1,9 @@
 ((LAMBDA (ASSOC EVCON PAIRLIS EVLIS APPLY EVAL)
    (EVAL (CONS
      (QUOTE 
-       (define a (quote 5)))
+       (cond
+         ((quote 5) (define a ((lambda (x) x) (quote 6))))
+         ((quote t) (quote 7))))
      ())))
  (QUOTE (LAMBDA (X Y)
           (COND ((EQ Y ()) ())
@@ -18,9 +20,13 @@
                 ((QUOTE T) (CONS (CONS (CAR X) (CAR Y))
                                  (PAIRLIS (CDR X) (CDR Y) A))))))
  (QUOTE (LAMBDA (M A)
-          (COND ((EQ M ()) ())
-                ((QUOTE T) (CONS (EVAL (CAR M) A)
-                                 (EVLIS (CDR M) A))))))
+          (COND ((EQ M ()) (CONS () A))
+                ((QUOTE T)
+                 ((LAMBDA (NEWSTATE)
+                    ((LAMBDA (NEWEVLISSTATE)
+                       (CONS (CONS (CAR NEWSTATE) (CAR NEWEVLISSTATE)) (CDR NEWEVLISSTATE)))
+                     (EVLIS (CDR M) (CDR NEWSTATE))))
+                  (EVAL (CONS (CAR M) A)))))))
  (QUOTE (LAMBDA (FN XRAW A)
           (COND
             ((ATOM FN)
@@ -52,8 +58,7 @@
                           (CONS (CAR NEWSTATE) (PAIRLIS (CONS (CAR (CDR E)) NIL)
                                                         (CONS (CAR NEWSTATE) NIL)
                                                         (CDR NEWSTATE))))
-                        (EVAL (CONS (CAR (CDR (CDR E)))
-                                    A))))
+                        (EVAL (CONS (CAR (CDR (CDR E))) A))))
                       ((QUOTE T) (APPLY (CAR E) (CDR E) A))))
                ((QUOTE T) (APPLY (CAR E) (CDR E) A))))
            (CAR STATE) (CDR STATE)))))
