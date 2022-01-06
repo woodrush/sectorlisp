@@ -104,9 +104,12 @@ PrintObject:					# PrintObject(x:si)
 	jnz	.PrintString			# -> ret
 	ret
 
-Print:	test	%di,%di
-	jz	NewLine
-	mov	(%di),%ax			# ax = Car(Cdr(e))
+Print:	mov	(%si),%si			# si = Cdr(e)
+	test	%si,%si
+	jnz	1f
+NewLine:mov	$'\r',%al
+	jmp	PutChar
+1:	mov	(%si),%ax			# ax = Car(Cdr(e))
 EvalPrint:
 	call	Eval
 	push	%dx
@@ -115,9 +118,6 @@ EvalPrint:
 	xchg	%dx,%ax
 	pop	%dx
 	ret
-
-NewLine:mov	$'\r',%al
-	jmp	PutChar
 
 Read:	push	%dx
 	mov	%fs,%dx				# Get cached character
@@ -282,11 +282,11 @@ Eval:	test	%ax,%ax				# Eval(e:ax,a:dx):ax
 	lodsw					# ax = Car(e)
 	cmp	$kRead,%ax
 	je	Read
+	cmp	$kPrint,%ax
+	je	Print
 	cmp	$kQuote,%ax			# maybe CONS
 	mov	(%si),%di			# di = Cdr(e)
 	je	Car
-	cmp	$kPrint,%ax
-	je	Print
 	cmp	$kCond,%ax
 	je	Evcon				# ABC Garbage Collector
 	push	%dx				# save a
