@@ -1,51 +1,42 @@
-((LAMBDA (_ MAINLOOP _ PRINTHELP _ LISTINGLOOP 
+((LAMBDA (_ PRINTHELP _ LISTINGLOOP _ PRINTLISTING
           _ PROGN _ APPEND _ BASICINTERPRETER)
-   (MAINLOOP))
-
- (QUOTE ;; MAINLOOP)
- (QUOTE (LAMBDA ()
-          (PROGN
-            (PRINTHELP)
-            (PRINT (QUOTE >))
-            ((LAMBDA (INPUT)
-               (COND ((EQ (QUOTE LIST) INPUT)
-                      ((LAMBDA (LISTING)
-                         (COND ((EQ NIL LISTING) (MAINLOOP))
-                               ((QUOTE T)
-                                (PROGN (BASICINTERPRETER LISTING)
-                                       (PRINT)
-                                       (MAINLOOP)))))
-                       (LISTINGLOOP ())))
-                     ((EQ (QUOTE RUN) INPUT)
-                      (PROGN (PRINT (QUOTE (PLEASE INPUT A BASIC PROGRAM
-                                            BEFORE RUNNING.)))
-                             (PRINT)
-                             (MAINLOOP)))
-                     ((EQ (QUOTE DISCARD) INPUT) (MAINLOOP))
-                     ((QUOTE T) (PRINT (QUOTE EXITING.)))))
-             (READ)))))
+   (LISTINGLOOP NIL))
 
  (QUOTE ;; PRINTHELP)
- (QUOTE (LAMBDA () (PROGN (PRINT (QUOTE (COMMANDS: LIST, RUN, DISCARD)))
+ (QUOTE (LAMBDA () (PROGN (PRINT (QUOTE (PLEASE ENTER A
+                                         BASIC PROGRAM LISTING,
+                                         `LIST`, `RUN`, OR `DISCARD`.)))
                           (PRINT))))
 
  (QUOTE ;; LISTINGLOOP)
  (QUOTE (LAMBDA (LISTING)
-          ((LAMBDA (_ _ X) X)
+          (PROGN
             (COND ((EQ NIL LISTING) (PRINTHELP)))
             (PRINT (QUOTE BASIC>))
             ((LAMBDA (INPUT)
-               (COND ((EQ (QUOTE RUN) INPUT) LISTING)
-                     ((EQ (QUOTE DISCARD) INPUT) NIL)
+               (COND ((EQ (QUOTE LIST) INPUT)
+                      (PROGN (PRINTLISTING LISTING)
+                             (LISTINGLOOP LISTING)))
+                     ((EQ (QUOTE RUN) INPUT)
+                      (PROGN (COND ((EQ NIL LISTING) NIL)
+                                   ((QUOTE T) (BASICINTERPRETER LISTING)))
+                             (PRINT)
+                             (LISTINGLOOP LISTING)))
+                     ((EQ (QUOTE DISCARD) INPUT) (LISTINGLOOP NIL))
                      ((ATOM INPUT)
-                      (PROGN
-                        (PRINT (QUOTE (PLEASE ENTER A
-                                       BASIC PROGRAM LISTING,
-                                       `RUN`, OR `DISCARD`.)))
-                        (LISTINGLOOP LISTING)))
+                      (PROGN (PRINTHELP)
+                             (LISTINGLOOP LISTING)))
                      ((QUOTE T)
                       (LISTINGLOOP (APPEND LISTING (CONS INPUT NIL))))))
              (READ)))))
+
+ (QUOTE ;; PRINTLISTING)
+ (QUOTE (LAMBDA (LISTING)
+          (COND ((EQ NIL LISTING) NIL)
+                ((QUOTE T)
+                 (PROGN (PRINT (CAR LISTING))
+                        (PRINT)
+                        (PRINTLISTING (CDR LISTING)))))))
 
  (QUOTE ;; PROGN)
  (QUOTE (LAMBDA () NIL))
@@ -199,9 +190,9 @@
                               ())))
                         (CAR (CDR (CDR (CDR (CDR BODY))))))))))))))
 
-LIST
 (10   REM FIND AND PRINT PRIME NUMBERS BELOW N_MAX.   )
 (20   LET N_MAX = (1 1 1 1 1   1 1 1 1 1   1 1 1 1 1) )
+LIST
 (30   LET I = (1 1)                                   )
 (40   IF N_MAX <= I THEN 200                          )
 (50       LET J = (1 1)                               )
@@ -213,4 +204,5 @@ LIST
 (110      PRINT I                                     )
 (120      LET I = I + (1)                             )
 (130  GOTO 40                                         )
+LIST
 RUN
