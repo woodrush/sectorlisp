@@ -57,7 +57,7 @@ main:	mov	%sp,%cx
 	mov	%dx,%fs				# Clear input lookahead cache
 	call	Read
 	call	Eval
-	xchg	%dx,%ax
+	xchg	%ax,%si
 	call	PrintObject
 	jmp	main
 
