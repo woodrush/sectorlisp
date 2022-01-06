@@ -1,5 +1,8 @@
-((LAMBDA (MAINLOOP PRINTHELP LISTINGLOOP PROGN APPEND BASICINTERPRETER)
+((LAMBDA (_ MAINLOOP _ PRINTHELP _ LISTINGLOOP 
+          _ PROGN _ APPEND _ BASICINTERPRETER)
    (MAINLOOP))
+
+ (QUOTE ;; MAINLOOP)
  (QUOTE (LAMBDA ()
           (PROGN
             (PRINTHELP)
@@ -14,14 +17,19 @@
                                        (MAINLOOP)))))
                        (LISTINGLOOP ())))
                      ((EQ (QUOTE RUN) INPUT)
-                      (PROGN (PRINT (QUOTE (PLEASE INPUT A BASIC PROGRAM BEFORE RUNNING.)))
+                      (PROGN (PRINT (QUOTE (PLEASE INPUT A BASIC PROGRAM
+                                            BEFORE RUNNING.)))
                              (PRINT)
                              (MAINLOOP)))
                      ((EQ (QUOTE DISCARD) INPUT) (MAINLOOP))
                      ((QUOTE T) (PRINT (QUOTE EXITING.)))))
              (READ)))))
+
+ (QUOTE ;; PRINTHELP)
  (QUOTE (LAMBDA () (PROGN (PRINT (QUOTE (COMMANDS: LIST, RUN, DISCARD)))
                           (PRINT))))
+
+ (QUOTE ;; LISTINGLOOP)
  (QUOTE (LAMBDA (LISTING)
           ((LAMBDA (_ _ X) X)
             (COND ((EQ NIL LISTING) (PRINTHELP)))
@@ -35,13 +43,20 @@
                                        BASIC PROGRAM LISTING,
                                        `RUN`, OR `DISCARD`.)))
                         (LISTINGLOOP LISTING)))
-                     ((QUOTE T) (LISTINGLOOP (APPEND LISTING (CONS INPUT NIL))))))
+                     ((QUOTE T)
+                      (LISTINGLOOP (APPEND LISTING (CONS INPUT NIL))))))
              (READ)))))
+
+ (QUOTE ;; PROGN)
  (QUOTE (LAMBDA () NIL))
+
+ (QUOTE ;; APPEND)
  (QUOTE (LAMBDA (L ITEM)
           (COND
           ((EQ NIL L) ITEM)
           ((QUOTE T) (CONS (CAR L) (APPEND (CDR L) ITEM))))))
+
+ (QUOTE ;; BASICINTERPRETER)
  (QUOTE (LAMBDA (FULLLISTING)
           ((LAMBDA (_ EXECLINE _ CONSSTATE _ FINDLABELLISTING _ + - % _ <=
                     _ RESOLVEVAR _ VARENVPREPEND _ EVALEXPR _ PARSEIF)
@@ -52,7 +67,8 @@
                   ((EQ NIL (CAR (CDR STATE))) (CAR (CDR (CDR STATE))))
                   ((QUOTE T) (LOOP (EXECLINE STATE) LOOP)))))))
 
-           (QUOTE ;; EXECLINE: STATE -> STATE: EXECUTE LINE AND RETURN THE NEXT STATE)
+           (QUOTE ;; EXECLINE: STATE -> STATE: EXECUTE LINE
+                  ;; AND RETURN THE NEXT STATE)
            (QUOTE (LAMBDA (STATE)
                     ((LAMBDA (CURSTATEMENT VARENV CURLISTING OUTPUT)
                        ((LAMBDA (LABEL STATEMENT BODY)
@@ -61,9 +77,10 @@
                              (CONSSTATE VARENV (CDR CURLISTING) OUTPUT))
                             ((EQ STATEMENT (QUOTE LET))
                              (CONSSTATE ((LAMBDA (VARNAME EXPR)
-                                           (VARENVPREPEND VARNAME
-                                                          (EVALEXPR EXPR VARENV)
-                                                          VARENV))
+                                           (VARENVPREPEND
+                                              VARNAME
+                                              (EVALEXPR EXPR VARENV)
+                                              VARENV))
                                          (CAR BODY) (CDR (CDR BODY)))
                                         (CDR CURLISTING)
                                         OUTPUT))
@@ -136,7 +153,8 @@
                       ((EQ NIL (- N M)) (QUOTE (1)))
                       ((QUOTE T) NIL))))
 
-           (QUOTE ;; RESOLVEVAR: VAR/INT, VARENV -> INT: RESOLVE THE INTEGER VALUE OF A VARIABLE)
+           (QUOTE ;; RESOLVEVAR: VAR/INT, VARENV -> INT:
+                  ;; RESOLVE THE INTEGER VALUE OF A VARIABLE)
            (QUOTE (LAMBDA (VARNAME VARENV)
                     (COND
                       ((EQ (ATOM VARNAME) NIL) VARNAME)
@@ -144,12 +162,15 @@
                       ((EQ VARNAME (CAR (CAR VARENV))) (CDR (CAR VARENV)))
                       ((QUOTE T) (RESOLVEVAR VARNAME (CDR VARENV))))))
 
-           (QUOTE ;; VARENVPREPEND: VARNAME, INT, VARENV -> VARENV: UPDATE THE VARIABLE VALUE IN THE VARENV)
+           (QUOTE ;; VARENVPREPEND: VARNAME, INT, VARENV -> VARENV: 
+                  ;; UPDATE THE VARIABLE VALUE IN THE VARENV)
            (QUOTE (LAMBDA (VARNAME N VARENV)
                     (CONS (CONS VARNAME N) VARENV)))
 
-           (QUOTE ;; EVALEXPR: EXPR, VARENV -> INT: EVALUATE INTEGER EXPRESSIONS.
-                  ;; EXPR IS A LIST EVEN IF THE INPUT IS A SINGLE VARIABLE OR AN INTEGER LITERAL.)
+           (QUOTE ;; EVALEXPR: EXPR, VARENV -> INT:
+                  ;; EVALUATE INTEGER EXPRESSIONS.
+                  ;; EXPR IS A LIST EVEN IF THE INPUT IS A
+                  ;; SINGLE VARIABLE OR AN INTEGER LITERAL.)
            (QUOTE (LAMBDA (EXPR VARENV)
                     (COND
                       ((EQ NIL (CDR EXPR)) (RESOLVEVAR (CAR EXPR) VARENV))
