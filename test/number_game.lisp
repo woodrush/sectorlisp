@@ -1,14 +1,19 @@
-((LAMBDA (MAIN GAMELOOP HELPMESSAGE - <= AND CMP PROGN)
+((LAMBDA (MAIN GAMELOOP HELPMESSAGE - <= AND CMP PROGN ;;)
    ((LAMBDA () (QUOTE (THE GAME HAS FINISHED.)))
     (MAIN)))
  (QUOTE (LAMBDA ()
           (PROGN
+            ;; (QUOTE PROGN IS DONE BY PASSING EXPRESSIONS TO A LAMBDA)
+            ;; (QUOTE NOTE THAT PROGN ALWAYS RETURNS NIL, NOT ITS FINAL VALUE)
+            ;; (QUOTE SINCE ALL VALUES ARE DISCARDED INSIDE PROGN,)
+            ;; (QUOTE COMMENTS CAN BE WRITTEN IN THIS MANNER)
             (PRINT (QUOTE (LET'S PLAY A NUMBER GUESSING GAME.
                            I'M THINKING OF A CERTAIN NUMBER
                            BETWEEN 1 AND 10.
                            SAY A NUMBER, AND I'LL TELL YOU IF IT'S
                            LESS THAN, GREATER THAN, OR EQUAL TO MY NUMBER.
                            CAN YOU GUESS WHAT NUMBER I'M THINKING OF?)))
+            ;; (QUOTE CALLING PRINT WITHOUT ARGUMENTS PRINTS A NEWLINE)
             (PRINT)
             (HELPMESSAGE)
             (GAMELOOP ())
@@ -18,6 +23,7 @@
             (PRINT (QUOTE >))
             (COND ((EQ (READ) (QUOTE Y))
                    (PROGN (PRINT (QUOTE (ALRIGHT!)))
+                          ;; (QUOTE INFINITE LOOPS ARE DONE USING RECURSION)
                           (MAIN)))
                   ((QUOTE T)
                    (PROGN (PRINT (QUOTE (THANK YOU FOR PLAYING!)))
@@ -30,6 +36,8 @@
        ((LAMBDA (GUESS ANSWER NUMTRIES)
           (COND ((ATOM GUESS)
                  (PROGN
+                   ;; (QUOTE WHEN THE USER INPUTS AN ATOM, SHOW USAGE TEXT)
+                   ;; (QUOTE THE NUMBER OF TRIES DO NOT INCREASE IN THIS CASE)
                    (HELPMESSAGE)
                    (GAMELOOP (CDR NUMTRIES))))
                 ((EQ (QUOTE <) (CMP GUESS ANSWER))
@@ -66,7 +74,8 @@
           (COND ((AND (<= N M) (<= M N)) (QUOTE ==))
                 ((<= N M) (QUOTE <))
                 ((<= M N) (QUOTE >)))))
- (QUOTE (LAMBDA () NIL)))
+ (QUOTE (LAMBDA () NIL))
+ NIL)
 (* * * * *)
 *
 (* * * * * * * *)
