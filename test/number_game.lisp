@@ -1,46 +1,56 @@
 ((LAMBDA (MAIN GAMELOOP HELPMESSAGE - <= AND CMP PROGN)
-   ((LAMBDA () (QUOTE (THE GAME HAS FINISHED.))) (MAIN)))
+   ((LAMBDA () (QUOTE (THE GAME HAS FINISHED.)))
+    (MAIN)))
  (QUOTE (LAMBDA ()
           (PROGN
             (PRINT (QUOTE (LET'S PLAY A NUMBER GUESSING GAME.
-                                I'M THINKING OF A CERTAIN NUMBER
-                                BETWEEN 1 AND 10.
-                                SAY A NUMBER, AND I'LL TELL YOU IF IT'S
-                                LESS THAN, GREATER THAN, OR EQUAL TO MY NUMBER.
-                                CAN YOU GUESS WHAT NUMBER I'M THINKING OF?)))
+                           I'M THINKING OF A CERTAIN NUMBER
+                           BETWEEN 1 AND 10.
+                           SAY A NUMBER, AND I'LL TELL YOU IF IT'S
+                           LESS THAN, GREATER THAN, OR EQUAL TO MY NUMBER.
+                           CAN YOU GUESS WHAT NUMBER I'M THINKING OF?)))
+            (PRINT)
             (HELPMESSAGE)
             (GAMELOOP ())
+            (PRINT)
             (PRINT (QUOTE (DO YOU WISH TO PLAY AGAIN? Y/N:)))
+            (PRINT)
             (PRINT (QUOTE >))
             (COND ((EQ (READ) (QUOTE Y))
                    (PROGN (PRINT (QUOTE (ALRIGHT!)))
                           (MAIN)))
                   ((QUOTE T)
-                   (PRINT (QUOTE (THANK YOU FOR PLAYING!))))))))
+                   (PROGN (PRINT (QUOTE (THANK YOU FOR PLAYING!)))
+                          (PRINT)))))))
  (QUOTE (LAMBDA (NUMTRIES)
-          (CONS (PRINT (QUOTE NUMBER>))
-                ((LAMBDA (GUESS ANSWER NUMTRIES)
-                   (COND ((ATOM GUESS)
-                          (PROGN (HELPMESSAGE)
-                                 (GAMELOOP (CDR NUMTRIES))))
-                         ((EQ (QUOTE <) (CMP GUESS ANSWER))
-                          (PROGN (PRINT (QUOTE (YOUR GUESS IS
-                                                LESS THAN MY NUMBER.)))
-                                 (GAMELOOP NUMTRIES)))
-                         ((EQ (QUOTE >) (CMP GUESS ANSWER))
-                          (PROGN (PRINT (QUOTE (YOUR GUESS IS
-                                                GREATER THAN MY NUMBER.)))
-                                 (GAMELOOP NUMTRIES)))
-                         ((QUOTE T)
-                          (PROGN (PRINT (QUOTE (THAT'S RIGHT! MY NUMBER IS:)))
-                                 (PRINT ANSWER)
-                                 (PRINT (QUOTE (YOU GUESSED CORRECTLY!
-                                                CONGRATULATIONS!)))
-                                 (PRINT (QUOTE (NUMBER OF TRIES:)))
-                                 (PRINT NUMTRIES)))))
-                 (READ)
-                 (QUOTE (* * * * * * *))
-                 (CONS (QUOTE *) NUMTRIES)))))
+          (PROGN (PRINT)
+                 (PRINT (QUOTE NUMBER>))
+                 ((LAMBDA (GUESS ANSWER NUMTRIES)
+                    (COND ((ATOM GUESS)
+                           (PROGN (HELPMESSAGE)
+                                  (GAMELOOP (CDR NUMTRIES))))
+                          ((EQ (QUOTE <) (CMP GUESS ANSWER))
+                           (PROGN (PRINT (QUOTE (YOUR GUESS IS
+                                                 LESS THAN MY NUMBER.)))
+                                  (GAMELOOP NUMTRIES)))
+                          ((EQ (QUOTE >) (CMP GUESS ANSWER))
+                           (PROGN (PRINT (QUOTE (YOUR GUESS IS
+                                                 GREATER THAN MY NUMBER.)))
+                                  (GAMELOOP NUMTRIES)))
+                          ((QUOTE T)
+                           (PROGN (PRINT (QUOTE (THAT'S RIGHT!
+                                                 MY NUMBER IS:)))
+                                  (PRINT ANSWER)
+                                  (PRINT)
+                                  (PRINT (QUOTE (YOU GUESSED CORRECTLY!
+                                                 CONGRATULATIONS!)))
+                                  (PRINT)
+                                  (PRINT (QUOTE (NUMBER OF TRIES:)))
+                                  (PRINT NUMTRIES)
+                                  (PRINT)))))
+                  (READ)
+                  (QUOTE (* * * * * * *))
+                  (CONS (QUOTE *) NUMTRIES)))))
  (QUOTE (LAMBDA ()
           (PRINT (QUOTE (PLEASE INPUT YOUR NUMBER IN UNARY.
                          FOR EXAMPLE, 1 IS (*), 3 IS (* * *), ETC.)))))
@@ -59,3 +69,4 @@
 *
 (* * * * * * * *)
 (* * * * * * *)
+N
