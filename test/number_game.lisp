@@ -1,33 +1,37 @@
 ((LAMBDA (MAIN GAMELOOP HELPMESSAGE - <= AND CMP PROGN ;;)
    ((LAMBDA () (QUOTE (THE GAME HAS FINISHED.)))
     (MAIN)))
- (QUOTE (LAMBDA ()
-          (PROGN
-            ;; (QUOTE PROGN IS DONE BY PASSING EXPRESSIONS TO A LAMBDA)
-            ;; (QUOTE NOTE THAT PROGN ALWAYS RETURNS NIL, NOT ITS FINAL VALUE)
-            ;; (QUOTE SINCE ALL VALUES ARE DISCARDED INSIDE PROGN,)
-            ;; (QUOTE COMMENTS CAN BE WRITTEN IN THIS MANNER)
-            (PRINT (QUOTE (LET'S PLAY A NUMBER GUESSING GAME.
-                           I'M THINKING OF A CERTAIN NUMBER
-                           BETWEEN 1 AND 10.
-                           SAY A NUMBER, AND I'LL TELL YOU IF IT'S
-                           LESS THAN, GREATER THAN, OR EQUAL TO MY NUMBER.
-                           CAN YOU GUESS WHAT NUMBER I'M THINKING OF?)))
-            ;; (QUOTE CALLING PRINT WITHOUT ARGUMENTS PRINTS A NEWLINE)
-            (PRINT)
-            (HELPMESSAGE)
-            (GAMELOOP ())
-            (PRINT)
-            (PRINT (QUOTE (DO YOU WISH TO PLAY AGAIN? Y/N:)))
-            (PRINT)
-            (PRINT (QUOTE >))
-            (COND ((EQ (READ) (QUOTE Y))
-                   (PROGN (PRINT (QUOTE (ALRIGHT!)))
-                          ;; (QUOTE INFINITE LOOPS ARE DONE USING RECURSION)
-                          (MAIN)))
-                  ((QUOTE T)
-                   (PROGN (PRINT (QUOTE (THANK YOU FOR PLAYING!)))
-                          (PRINT)))))))
+ (QUOTE
+   (LAMBDA ()
+     (PROGN
+       ;; (QUOTE - PROGN IS IMPLEMENTED BY PASSING EXPRESSIONS AS ARGUMENTS)
+       ;; (QUOTE   TO AN EMPTY LAMBDA, WHICH ARE EVALUATED SEQUENTIALLY.)
+       ;; (QUOTE - NOTE THAT PROGN ALWAYS RETURNS NIL, NOT ITS FINAL VALUE.)
+       ;; (QUOTE   THIS CAN BE ALLEVIATED BY USING CONS INSTEAD OF PROGN)
+       ;; (QUOTE   FOR SEQUENTIAL EVALUATION.)
+       ;; (QUOTE - SINCE ALL VALUES ARE DISCARDED INSIDE PROGN,)
+       ;; (QUOTE   COMMENTS CAN BE WRITTEN IN THIS MANNER.)
+       ;; (QUOTE - NOTE THAT `;;` IS A VALID VARIABLE BINDED TO NIL.)
+       (PRINT (QUOTE (LET'S PLAY A NUMBER GUESSING GAME.
+                      I'M THINKING OF A CERTAIN NUMBER BETWEEN 1 AND 10.
+                      SAY A NUMBER, AND I'LL TELL YOU IF IT'S
+                      LESS THAN, GREATER THAN, OR EQUAL TO MY NUMBER.
+                      CAN YOU GUESS WHAT NUMBER I'M THINKING OF?)))
+       ;; (QUOTE CALLING PRINT WITHOUT ARGUMENTS PRINTS A NEWLINE)
+       (PRINT)
+       (HELPMESSAGE)
+       (GAMELOOP ())
+       (PRINT)
+       (PRINT (QUOTE (DO YOU WISH TO PLAY AGAIN? Y/N:)))
+       (PRINT)
+       (PRINT (QUOTE >))
+       (COND ((EQ (READ) (QUOTE Y))
+              (PROGN (PRINT (QUOTE (ALRIGHT!)))
+                     ;; (QUOTE INFINITE LOOPS ARE DONE USING RECURSION)
+                     (MAIN)))
+             ((QUOTE T)
+              (PROGN (PRINT (QUOTE (THANK YOU FOR PLAYING!)))
+                     (PRINT)))))))
  (QUOTE
    (LAMBDA (NUMTRIES)
      (PROGN
