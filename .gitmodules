@@ -1,0 +1,3 @@
+[submodule "sectorlisp-nn"]
+	path = sectorlisp-nn
+	url = https://github.com/woodrush/sectorlisp-nn

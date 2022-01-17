@@ -1,3 +1,5 @@
+nn: ../sectorlisp-nn/nn.lisp qemu.sh tcat
+	sh qemu.sh ../sectorlisp-nn/nn.lisp
 test1: test1.lisp qemu.sh tcat
 	sh qemu.sh test1.lisp
 test2: test2.lisp qemu.sh tcat
