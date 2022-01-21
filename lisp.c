@@ -181,8 +181,12 @@ Gc(x, m, k) {
 }
 
 Evlis(m, a) {
-  return m ? Cons(Eval(Car(m), a),
-                  Evlis(Cdr(m), a)) : 0;
+  if (m) {
+    int x = Eval(Car(m), a);
+    return Cons(x, Evlis(Cdr(m), a));
+  } else {
+    return 0;
+  }
 }
 
 Pairlis(x, y, a) {
