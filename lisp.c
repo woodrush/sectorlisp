@@ -34,14 +34,16 @@
 #define kT          4
 #define kQuote      6
 #define kCond       12
-#define kAtom       17
-#define kCar        22
-#define kCdr        26
-#define kCons       30
-#define kEq         35
+#define kRead       17
+#define kPrint      22
+#define kAtom       28
+#define kCar        33
+#define kCdr        37
+#define kCons       41
+#define kEq         46
 
 #define M (RAM + sizeof(RAM) / sizeof(RAM[0]) / 2)
-#define S "NIL\0T\0QUOTE\0COND\0ATOM\0CAR\0CDR\0CONS\0EQ"
+#define S "NIL\0T\0QUOTE\0COND\0READ\0PRINT\0ATOM\0CAR\0CDR\0CONS\0EQ"
 
 int cx; /* stores negative memory use */
 int dx; /* stores lookahead character */
@@ -149,6 +151,9 @@ PrintObject(x) {
 
 Print(e) {
   PrintObject(e);
+}
+
+PrintNewLine() {
   PrintChar('\n');
 }
 
@@ -207,6 +212,8 @@ Apply(f, x, a) {
   if (f == kAtom) return Car(x) < 0 ? 0 : kT;
   if (f == kCar)  return Car(Car(x));
   if (f == kCdr)  return Cdr(Car(x));
+  if (f == kRead) return Read();
+  if (f == kPrint) return (x ? Print(Car(x)) : PrintNewLine()), 0;
 }
 
 Eval(e, a) {
@@ -242,5 +249,6 @@ main() {
   for (;;) {
     cx = 0;
     Print(Eval(Read(), 0));
+    PrintNewLine();
   }
 }
